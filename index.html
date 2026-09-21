@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="DevBox 在线开发者工具箱 - JSON 格式化、Base64 编解码、时间戳转换、颜色转换、正则测试等实用工具" />
+  <title>DevBox · 在线开发者工具箱</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 顶栏 -->
+  <header class="topbar">
+    <button class="icon-btn menu-btn" id="menuBtn" aria-label="打开菜单" title="菜单">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <div class="brand">
+      <span class="brand-logo">🧰</span>
+      <span class="brand-name">DevBox</span>
+      <span class="brand-sub">开发者工具箱</span>
+    </div>
+    <div class="topbar-actions">
+      <div class="search-wrap">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="搜索工具…" autocomplete="off" />
+      </div>
+      <button class="icon-btn" id="themeBtn" aria-label="切换主题" title="切换深色/浅色">
+        <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+      <nav id="toolNav"></nav>
+      <footer class="sidebar-footer">
+        <span>DevBox v1.0</span>
+        <span>纯前端 · 无需登录</span>
+      </footer>
+    </aside>
+
+    <!-- 遮罩 -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- 主内容 -->
+    <main class="main" id="main">
+      <!-- 首页 -->
+      <section class="page active" id="page-home">
+        <h1 class="page-title">精选在线工具</h1>
+        <p class="page-desc">纯前端运行，数据不离开浏览器，随时随地即开即用。</p>
+        <div class="tool-grid" id="toolGrid"></div>
+      </section>
+
+      <!-- JSON 格式化 -->
+      <section class="page" id="page-json">
+        <h1 class="page-title">JSON 格式化 / 压缩 / 校验</h1>
+        <div class="toolbar">
+          <button class="btn primary" data-json="format">格式化</button>
+          <button class="btn" data-json="minify">压缩</button>
+          <button class="btn" data-json="sort">排序键</button>
+          <button class="btn" data-json="escape">转义 \</button>
+          <button class="btn" data-json="unescape">去转义</button>
+          <button class="btn ghost" data-json="clear">清空</button>
+        </div>
+        <div class="split">
+          <div class="pane">
+            <label class="pane-label">输入</label>
+            <textarea id="jsonInput" spellcheck="false" placeholder='粘贴 JSON 文本，例如 {"name":"DevBox","tags":["json","tools"]}'></textarea>
+          </div>
+          <div class="pane">
+            <label class="pane-label">输出 <span id="jsonStats" class="stats"></span></label>
+            <textarea id="jsonOutput" spellcheck="false" readonly placeholder="结果将显示在这里"></textarea>
+          </div>
+        </div>
+        <div class="msg error hidden" id="jsonError"></div>
+      </section>
+
+      <!-- Base64 -->
+      <section class="page" id="page-base64">
+        <h1 class="page-title">Base64 编码 / 解码</h1>
+        <div class="toolbar">
+          <button class="btn primary" data-b64="encode">编码</button>
+          <button class="btn" data-b64="decode">解码</button>
+          <label class="btn toggle"><input type="checkbox" id="b64UrlSafe" /> URL 安全模式</label>
+          <label class="btn toggle"><input type="checkbox" id="b64Utf8" checked /> 支持 UTF-8 中文</label>
+          <button class="btn ghost" data-b64="clear">清空</button>
+        </div>
+        <div class="split">
+          <div class="pane">
+            <label class="pane-label">输入</label>
+            <textarea id="b64Input" spellcheck="false" placeholder="输入文本或 Base64 字符串"></textarea>
+          </div>
+          <div class="pane">
+            <label class="pane-label">输出</label>
+            <textarea id="b64Output" spellcheck="false" readonly placeholder="结果将显示在这里"></textarea>
+          </div>
+        </div>
+        <div class="msg error hidden" id="b64Error"></div>
+      </section>
+
+      <!-- URL 编解码 -->
+      <section class="page" id="page-url">
+        <h1 class="page-title">URL 编码 / 解码</h1>
+        <div class="toolbar">
+          <button class="btn primary" data-url="encode">编码 encodeURIComponent</button>
+          <button class="btn" data-url="encodeFull">编码 encodeURI</button>
+          <button class="btn" data-url="decode">解码</button>
+          <button class="btn ghost" data-url="clear">清空</button>
+        </div>
+        <div class="split">
+          <div class="pane">
+            <label class="pane-label">输入</label>
+            <textarea id="urlInput" spellcheck="false" placeholder="输入 URL 或参数文本"></textarea>
+          </div>
+          <div class="pane">
+            <label class="pane-label">输出</label>
+            <textarea id="urlOutput" spellcheck="false" readonly placeholder="结果将显示在这里"></textarea>
+          </div>
+        </div>
+        <div class="msg error hidden" id="urlError"></div>
+      </section>
+
+      <!-- 时间戳 -->
+      <section class="page" id="page-timestamp">
+        <h1 class="page-title">时间戳转换</h1>
+        <div class="card">
+          <h2 class="card-title">当前时间</h2>
+          <div class="now-grid">
+            <div class="now-item"><span class="now-label">本地时间</span><strong id="nowLocal">--</strong></div>
+            <div class="now-item"><span class="now-label">ISO 8601</span><strong id="nowIso">--</strong></div>
+            <div class="now-item"><span class="now-label">Unix 秒</span><strong id="nowSec">--</strong></div>
+            <div class="now-item"><span class="now-label">Unix 毫秒</span><strong id="nowMs">--</strong></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">时间戳 → 日期</h2>
+          <div class="row">
+            <input type="text" id="tsInput" placeholder="输入秒或毫秒时间戳，如 1735689600" />
+            <button class="btn primary" id="tsToBtn">转换</button>
+          </div>
+          <div class="result-table" id="tsResult"></div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">日期 → 时间戳</h2>
+          <div class="row">
+            <input type="datetime-local" id="dateInput" step="1" />
+            <button class="btn primary" id="dateToBtn">转换</button>
+          </div>
+          <div class="result-table" id="dateResult"></div>
+        </div>
+      </section>
+
+      <!-- 颜色转换 -->
+      <section class="page" id="page-color">
+        <h1 class="page-title">颜色转换器</h1>
+        <div class="card">
+          <div class="row">
+            <input type="color" id="colorPicker" value="#3b82f6" />
+            <input type="text" id="colorInput" value="#3b82f6" spellcheck="false" placeholder="#hex 或 rgb(...)" />
+          </div>
+          <div class="result-table" id="colorResult"></div>
+          <div class="color-preview" id="colorPreview"></div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">CSS 渐变速查</h2>
+          <div class="gradient-grid">
+            <div class="gradient-item" style="background:linear-gradient(135deg,#667eea,#764ba2)"></div>
+            <div class="gradient-item" style="background:linear-gradient(135deg,#f093fb,#f5576c)"></div>
+            <div class="gradient-item" style="background:linear-gradient(135deg,#4facfe,#00f2fe)"></div>
+            <div class="gradient-item" style="background:linear-gradient(135deg,#43e97b,#38f9d7)"></div>
+            <div class="gradient-item" style="background:linear-gradient(135deg,#fa709a,#fee140)"></div>
+            <div class="gradient-item" style="background:linear-gradient(135deg,#30cfd0,#330867)"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 正则测试 -->
+      <section class="page" id="page-regex">
+        <h1 class="page-title">正则表达式测试</h1>
+        <div class="card">
+          <div class="row">
+            <span class="regex-slash">/</span>
+            <input type="text" id="regexPattern" spellcheck="false" value="\d+" placeholder="正则表达式" />
+            <span class="regex-slash">/</span>
+            <input type="text" id="regexFlags" value="g" spellcheck="false" placeholder="flags" class="flags-input" />
+          </div>
+          <textarea id="regexText" spellcheck="false" rows="6" placeholder="输入测试文本，例如：订单号 12345，数量 678，共 901">订单号 12345，数量 678，共 901</textarea>
+          <div class="msg info" id="regexMsg">输入正则后自动匹配</div>
+          <div class="highlight-box" id="regexHighlight"></div>
+        </div>
+      </section>
+
+      <!-- 密码生成 -->
+      <section class="page" id="page-password">
+        <h1 class="page-title">密码生成器</h1>
+        <div class="card">
+          <div class="pwd-output" id="pwdOutput">点击生成密码</div>
+          <div class="toolbar">
+            <button class="btn primary" id="pwdGenBtn">生成密码</button>
+            <button class="btn" id="pwdCopyBtn">复制</button>
+          </div>
+          <div class="form-row">
+            <label>长度 <output id="pwdLenVal">16</output></label>
+            <input type="range" id="pwdLen" min="6" max="64" value="16" />
+          </div>
+          <div class="checks">
+            <label class="check"><input type="checkbox" id="pwdUpper" checked /> 大写 A-Z</label>
+            <label class="check"><input type="checkbox" id="pwdLower" checked /> 小写 a-z</label>
+            <label class="check"><input type="checkbox" id="pwdNum" checked /> 数字 0-9</label>
+            <label class="check"><input type="checkbox" id="pwdSym" checked /> 符号 !@#$%</label>
+            <label class="check"><input type="checkbox" id="pwdNoAmb" /> 排除易混淆字符 (0O1lI)</label>
+          </div>
+          <div class="strength" id="pwdStrength"><i></i></div>
+        </div>
+      </section>
+
+      <!-- 文本工具 -->
+      <section class="page" id="page-text">
+        <h1 class="page-title">文本处理</h1>
+        <div class="toolbar">
+          <button class="btn" data-text="upper">转大写</button>
+          <button class="btn" data-text="lower">转小写</button>
+          <button class="btn" data-text="trim">去首尾空白</button>
+          <button class="btn" data-text="trimLines">去每行首尾空白</button>
+          <button class="btn" data-text="dedup">去重行</button>
+          <button class="btn" data-text="sort">行排序</button>
+          <button class="btn" data-text="reverse">行倒序</button>
+          <button class="btn" data-text="nl2comma">换行→逗号</button>
+          <button class="btn ghost" data-text="clear">清空</button>
+        </div>
+        <div class="split">
+          <div class="pane">
+            <label class="pane-label">输入 <span id="textStats" class="stats"></span></label>
+            <textarea id="textInput" spellcheck="false" placeholder="输入文本"></textarea>
+          </div>
+          <div class="pane">
+            <label class="pane-label">输出</label>
+            <textarea id="textOutput" spellcheck="false" readonly placeholder="结果将显示在这里"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- UUID -->
+      <section class="page" id="page-uuid">
+        <h1 class="page-title">UUID / 随机 ID 生成</h1>
+        <div class="toolbar">
+          <button class="btn primary" id="uuidGenBtn">生成 UUID v4</button>
+          <button class="btn" id="nanoidGenBtn">生成 NanoID</button>
+          <button class="btn" id="uuidClearBtn">清空</button>
+        </div>
+        <div class="list-box" id="uuidList"></div>
+      </section>
+
+      <!-- MD5/哈希 -->
+      <section class="page" id="page-hash">
+        <h1 class="page-title">哈希计算（SHA 系列）</h1>
+        <div class="card">
+          <div class="pane-label">输入文本</div>
+          <textarea id="hashInput" spellcheck="false" rows="4" placeholder="输入任意文本，使用浏览器原生 WebCrypto 计算"></textarea>
+          <button class="btn primary" id="hashBtn">计算哈希</button>
+          <div class="result-table" id="hashResult"></div>
+        </div>
+      </section>
+
+      <!-- 单位换算 -->
+      <section class="page" id="page-convert">
+        <h1 class="page-title">单位换算</h1>
+        <div class="card">
+          <h2 class="card-title">长度 / 重量 / 温度 / 数据量</h2>
+          <div class="row">
+            <input type="number" id="cvValue" value="1" step="any" />
+            <select id="cvFrom"></select>
+            <span class="cv-arrow">→</span>
+            <select id="cvTo"></select>
+            <button class="btn primary" id="cvBtn">换算</button>
+          </div>
+          <div class="result-table" id="cvResult"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
